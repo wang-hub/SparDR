@@ -1,0 +1,95 @@
+#[version = "0.0.5"]
+primfn(data_1: handle, kernel_1: handle, compute_1: handle) -> ()
+  attr = {"from_legacy_te_schedule": True, "global_symbol": "main", "tir.noalias": True}
+  buffers = {compute: Buffer(compute_2: Pointer(float32), float32, [1, 512, 28, 28], []),
+             kernel: Buffer(kernel_2: Pointer(float32), float32, [512, 512, 3, 3], []),
+             data: Buffer(data_2: Pointer(float32), float32, [1, 512, 28, 28], [])}
+  buffer_map = {data_1: data, kernel_1: kernel, compute_1: compute} {
+  for (nn.outer.outer.ff.outer.outer.fused.yy.outer.outer.fused.xx.outer.outer.fused.nn.outer.inner.fused.ff.outer.inner.fused.yy.outer.inner.fused: int32, 0, 28) "parallel" {
+    allocate(compute.local: Pointer(local float32), float32, [7168]), storage_scope = local;
+    allocate(pad_temp: Pointer(global float32), float32, [6144]), storage_scope = global;
+    for (xx.outer.inner: int32, 0, 2) {
+      for (ff.c.outer.inner.init: int32, 0, 32) {
+        for (yy.c.outer.inner.init: int32, 0, 2) {
+          for (xx.c.outer.inner.init: int32, 0, 2) {
+            for (ff.c.inner.init: int32, 0, 4) {
+              for (yy.c.inner.init: int32, 0, 2) {
+                compute.local[ramp((((((ff.c.outer.inner.init*224) + (ff.c.inner.init*56)) + (yy.c.outer.inner.init*28)) + (yy.c.inner.init*14)) + (xx.c.outer.inner.init*7)), 1, 7)] = broadcast(0f32, 7)
+              }
+            }
+          }
+        }
+      }
+      for (rc.outer: int32, 0, 8) {
+        for (i1: int32, 0, 64) {
+          for (i2: int32, 0, 6) {
+            for (i3: int32, 0, 16) {
+              pad_temp[(((i1*96) + (i2*16)) + i3)] = @tir.if_then_else(((((1 <= ((floordiv(nn.outer.outer.ff.outer.outer.fused.yy.outer.outer.fused.xx.outer.outer.fused.nn.outer.inner.fused.ff.outer.inner.fused.yy.outer.inner.fused, 4)*4) + i2)) && (((floordiv(nn.outer.outer.ff.outer.outer.fused.yy.outer.outer.fused.xx.outer.outer.fused.nn.outer.inner.fused.ff.outer.inner.fused.yy.outer.inner.fused, 4)*4) + i2) < 29)) && (1 <= ((xx.outer.inner*14) + i3))) && (((xx.outer.inner*14) + i3) < 29)), (float32*)data_2[(((((((rc.outer*50176) + (i1*784)) + (floordiv(nn.outer.outer.ff.outer.outer.fused.yy.outer.outer.fused.xx.outer.outer.fused.nn.outer.inner.fused.ff.outer.inner.fused.yy.outer.inner.fused, 4)*112)) + (i2*28)) + (xx.outer.inner*14)) + i3) - 29)], 0f32, dtype=float32)
+            }
+          }
+        }
+        for (ff.c.outer.inner: int32, 0, 32) {
+          for (yy.c.outer.inner: int32, 0, 2) {
+            for (xx.c.outer.inner: int32, 0, 2) {
+              for (rc.inner: int32, 0, 64) {
+                for (ry.inner: int32, 0, 3) {
+                  for (rx.inner: int32, 0, 3) {
+                    for (ff.c.inner: int32, 0, 4) {
+                      for (yy.c.inner: int32, 0, 2) {
+                        compute.local[ramp((((((ff.c.outer.inner*224) + (ff.c.inner*56)) + (yy.c.outer.inner*28)) + (yy.c.inner*14)) + (xx.c.outer.inner*7)), 1, 7)] = ((float32x7*)compute.local[ramp((((((ff.c.outer.inner*224) + (ff.c.inner*56)) + (yy.c.outer.inner*28)) + (yy.c.inner*14)) + (xx.c.outer.inner*7)), 1, 7)] + ((float32x7*)pad_temp[ramp(((((((rc.inner*96) + (yy.c.outer.inner*32)) + (yy.c.inner*16)) + (ry.inner*16)) + (xx.c.outer.inner*7)) + rx.inner), 1, 7)]*broadcast((float32*)kernel_2[(((((((floormod(nn.outer.outer.ff.outer.outer.fused.yy.outer.outer.fused.xx.outer.outer.fused.nn.outer.inner.fused.ff.outer.inner.fused.yy.outer.inner.fused, 4)*589824) + (ff.c.outer.inner*18432)) + (ff.c.inner*4608)) + (rc.outer*576)) + (rc.inner*9)) + (ry.inner*3)) + rx.inner)], 7)))
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      for (ff.inner: int32, 0, 128) {
+        for (yy.inner: int32, 0, 4) {
+          compute_2[ramp((((((floormod(nn.outer.outer.ff.outer.outer.fused.yy.outer.outer.fused.xx.outer.outer.fused.nn.outer.inner.fused.ff.outer.inner.fused.yy.outer.inner.fused, 4)*100352) + (ff.inner*784)) + (floordiv(nn.outer.outer.ff.outer.outer.fused.yy.outer.outer.fused.xx.outer.outer.fused.nn.outer.inner.fused.ff.outer.inner.fused.yy.outer.inner.fused, 4)*112)) + (yy.inner*28)) + (xx.outer.inner*14)), 1, 14)] = (float32x14*)compute.local[ramp(((ff.inner*56) + (yy.inner*14)), 1, 14)]
+        }
+      }
+    }
+  }
+}
+
+#[metadata]
+{
+  "root": 1, 
+  "nodes": [
+    {
+      "type_key": ""
+    }, 
+    {
+      "type_key": "Map", 
+      "keys": [
+        "IntImm"
+      ], 
+      "data": [2]
+    }, 
+    {
+      "type_key": "Array", 
+      "data": [3, 4]
+    }, 
+    {
+      "type_key": "IntImm", 
+      "attrs": {
+        "dtype": "bool", 
+        "span": "0", 
+        "value": "1"
+      }
+    }, 
+    {
+      "type_key": "IntImm", 
+      "attrs": {
+        "dtype": "bool", 
+        "span": "0", 
+        "value": "1"
+      }
+    }
+  ], 
+  "b64ndarrays": [], 
+  "attrs": {"tvm_version": "0.8.dev0"}
+}
