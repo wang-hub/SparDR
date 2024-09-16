@@ -1,5 +1,5 @@
-# SPT
-Accelerating Convolution of CNN via Sparse Weight Pre-Indexing on TVM
+# SparDR
+SparDR:Accelerating Unstructured Sparse DNN Inference via Dataflow Optimization
 
 ## 使用说明
 
